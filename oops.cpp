@@ -14,43 +14,43 @@ public:
 
     void getInput() {
         std::cout << "Enter temperature (°C): ";
-        std::cin >> temperature;
+        std::cin >> this->temperature;
         std::cout << "Enter humidity (%): ";
-        std::cin >> humidity;
+        std::cin >> this->humidity;
         std::cout << "Enter wind speed (km/h): ";
-        std::cin >> windSpeed;
+        std::cin >> this->windSpeed;
         std::cout << "Is there precipitation? (1 for yes, 0 for no): ";
-        std::cin >> isPrecipitation;
+        std::cin >> this->isPrecipitation;
     }
 
-    double getTemperature() const { return temperature; }
-    double getHumidity() const { return humidity; }
-    double getWindSpeed() const { return windSpeed; }
-    bool getIsPrecipitation() const { return isPrecipitation; }
+    double getTemperature() const { return this->temperature; }
+    double getHumidity() const { return this->humidity; }
+    double getWindSpeed() const { return this->windSpeed; }
+    bool getIsPrecipitation() const { return this->isPrecipitation; }
 };
 
 class WeatherPredictor {
 public:
-    static std::string predictClimate(const WeatherData& data) {
-        if (data.getIsPrecipitation()) {
-            if (data.getTemperature() <= 0) return "Snowy";
+    static std::string predictClimate(const WeatherData* data) {
+        if (data->getIsPrecipitation()) {
+            if (data->getTemperature() <= 0) return "Snowy";
             else return "Rainy";
-        } else if (data.getTemperature() > 25 && data.getHumidity() < 60) {
+        } else if (data->getTemperature() > 25 && data->getHumidity() < 60) {
             return "Sunny";
-        } else if (data.getTemperature() < 10) {
+        } else if (data->getTemperature() < 10) {
             return "Cold";
         } else {
             return "Cloudy";
         }
     }
 
-    static std::vector<std::string> suggestClothes(const std::string& climate) {
+    static std::vector<std::string> suggestClothes(const std::string* climate) {
         std::vector<std::string> clothes;
-        if (climate == "Snowy" || climate == "Cold") {
+        if (*climate == "Snowy" || *climate == "Cold") {
             clothes = {"Warm coat", "Scarf", "Gloves", "Boots"};
-        } else if (climate == "Rainy") {
+        } else if (*climate == "Rainy") {
             clothes = {"Raincoat", "Umbrella", "Waterproof shoes"};
-        } else if (climate == "Sunny") {
+        } else if (*climate == "Sunny") {
             clothes = {"Light shirt", "Sunglasses", "Hat"};
         } else {
             clothes = {"Light jacket", "Comfortable shoes"};
@@ -58,13 +58,13 @@ public:
         return clothes;
     }
 
-    static std::vector<std::string> suggestFood(const std::string& climate) {
+    static std::vector<std::string> suggestFood(const std::string* climate) {
         std::vector<std::string> foods;
-        if (climate == "Snowy" || climate == "Cold") {
+        if (*climate == "Snowy" || *climate == "Cold") {
             foods = {"Hot soup", "Warm tea", "Stew"};
-        } else if (climate == "Rainy") {
+        } else if (*climate == "Rainy") {
             foods = {"Comfort food", "Hot chocolate", "Grilled cheese sandwich"};
-        } else if (climate == "Sunny") {
+        } else if (*climate == "Sunny") {
             foods = {"Salad", "Cold drinks", "Ice cream"};
         } else {
             foods = {"Balanced meal", "Fruit"};
@@ -74,14 +74,14 @@ public:
 };
 
 int main() {
-    WeatherData weatherData;
-    weatherData.getInput();
+    WeatherData* weatherData = new WeatherData();
+    weatherData->getInput();
 
-    std::string climate = WeatherPredictor::predictClimate(weatherData);
+    std::string* climate = new std::string(WeatherPredictor::predictClimate(weatherData));
     std::vector<std::string> clothes = WeatherPredictor::suggestClothes(climate);
     std::vector<std::string> foods = WeatherPredictor::suggestFood(climate);
 
-    std::cout << "\nPredicted climate: " << climate << std::endl;
+    std::cout << "\nPredicted climate: " << *climate << std::endl;
 
     std::cout << "Suggested clothes:" << std::endl;
     for (const auto& item : clothes) {
@@ -92,6 +92,9 @@ int main() {
     for (const auto& item : foods) {
         std::cout << "- " << item << std::endl;
     }
+
+    delete weatherData;
+    delete climate;
 
     return 0;
 }
