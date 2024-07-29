@@ -60,6 +60,7 @@ public:
 
     static std::vector<std::string> suggestFood(const std::string* climate) {
         std::vector<std::string> foods;
+        
         if (*climate == "Snowy" || *climate == "Cold") {
             foods = {"Hot soup", "Warm tea", "Stew"};
         } else if (*climate == "Rainy") {
@@ -70,31 +71,39 @@ public:
             foods = {"Balanced meal", "Fruit"};
         }
         return foods;
+
     }
 };
 
 int main() {
-    WeatherData* weatherData = new WeatherData();
-    weatherData->getInput();
+    const int NUM_DAYS = 3;
+    WeatherData weatherDataArray[NUM_DAYS];
+    
+    
+    for (int i = 0; i < NUM_DAYS; i++) {
+        std::cout << "\nEnter weather data for day " << i+1 << ":\n";
+        weatherDataArray[i].getInput();
 
-    std::string* climate = new std::string(WeatherPredictor::predictClimate(weatherData));
-    std::vector<std::string> clothes = WeatherPredictor::suggestClothes(climate);
-    std::vector<std::string> foods = WeatherPredictor::suggestFood(climate);
-
-    std::cout << "\nPredicted climate: " << *climate << std::endl;
-
-    std::cout << "Suggested clothes:" << std::endl;
-    for (const auto& item : clothes) {
-        std::cout << "- " << item << std::endl;
     }
-
-    std::cout << "Suggested foods:" << std::endl;
-    for (const auto& item : foods) {
-        std::cout << "- " << item << std::endl;
+    
+    for (int i = 0; i < NUM_DAYS; i++) {
+        std::cout << "\n--- Day " << i+1 << " Forecast ---\n";
+        std::string climate = WeatherPredictor::predictClimate(&weatherDataArray[i]);
+        std::vector<std::string> clothes = WeatherPredictor::suggestClothes(&climate);
+        std::vector<std::string> foods = WeatherPredictor::suggestFood(&climate);
+        
+        std::cout << "Predicted climate: " << climate << std::endl;
+        
+        std::cout << "Suggested clothes:" << std::endl;
+        for (const auto& item : clothes) {
+            std::cout << "- " << item << std::endl;
+        }
+        
+        std::cout << "Suggested foods:" << std::endl;
+        for (const auto& item : foods) {
+            std::cout << "- " << item << std::endl;
+        }
     }
-
-    delete weatherData;
-    delete climate;
-
+    
     return 0;
 }
