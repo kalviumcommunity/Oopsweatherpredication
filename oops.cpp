@@ -60,6 +60,7 @@ public:
 
     static std::vector<std::string> suggestFood(const std::string* climate) {
         std::vector<std::string> foods;
+        
         if (*climate == "Snowy" || *climate == "Cold") {
             foods = {"Hot soup", "Warm tea", "Stew"};
         } else if (*climate == "Rainy") {
@@ -70,6 +71,7 @@ public:
             foods = {"Balanced meal", "Fruit"};
         }
         return foods;
+
     }
 };
 
@@ -77,9 +79,11 @@ int main() {
     const int NUM_DAYS = 3;
     WeatherData weatherDataArray[NUM_DAYS];
     
+    
     for (int i = 0; i < NUM_DAYS; i++) {
         std::cout << "\nEnter weather data for day " << i+1 << ":\n";
         weatherDataArray[i].getInput();
+
     }
     
     for (int i = 0; i < NUM_DAYS; i++) {
