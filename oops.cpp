@@ -77,17 +77,17 @@ public:
 
 int main() {
     const int NUM_DAYS = 3;
-    WeatherData weatherDataArray[NUM_DAYS];
-    
+
+    // Dynamically allocate memory for the WeatherData array
+    WeatherData* weatherDataArray = new WeatherData[NUM_DAYS];
     
     for (int i = 0; i < NUM_DAYS; i++) {
-        std::cout << "\nEnter weather data for day " << i+1 << ":\n";
+        std::cout << "\nEnter weather data for day " << i + 1 << ":\n";
         weatherDataArray[i].getInput();
-
     }
     
     for (int i = 0; i < NUM_DAYS; i++) {
-        std::cout << "\n--- Day " << i+1 << " Forecast ---\n";
+        std::cout << "\n--- Day " << i + 1 << " Forecast ---\n";
         std::string climate = WeatherPredictor::predictClimate(&weatherDataArray[i]);
         std::vector<std::string> clothes = WeatherPredictor::suggestClothes(&climate);
         std::vector<std::string> foods = WeatherPredictor::suggestFood(&climate);
@@ -105,5 +105,8 @@ int main() {
         }
     }
     
+    // Free the dynamically allocated memory
+    delete[] weatherDataArray;
+
     return 0;
 }
