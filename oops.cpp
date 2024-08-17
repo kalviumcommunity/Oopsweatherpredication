@@ -9,8 +9,17 @@ private:
     double windSpeed;
     bool isPrecipitation;
 
+    // Static member variable to count the number of WeatherData instances
+    static int instanceCount;
+
 public:
-    WeatherData() : temperature(0), humidity(0), windSpeed(0), isPrecipitation(false) {}
+    WeatherData() : temperature(0), humidity(0), windSpeed(0), isPrecipitation(false) {
+        instanceCount++;
+    }
+
+    ~WeatherData() {
+        instanceCount--;
+    }
 
     void getInput() {
         std::cout << "Enter temperature (°C): ";
@@ -27,9 +36,27 @@ public:
     double getHumidity() const { return this->humidity; }
     double getWindSpeed() const { return this->windSpeed; }
     bool getIsPrecipitation() const { return this->isPrecipitation; }
+
+    static int getInstanceCount() {
+        return instanceCount;
+    }
 };
 
+// Initialize static member variable
+int WeatherData::instanceCount = 0;
+
 class WeatherPredictor {
+private:
+    // Static member variables for default recommendations
+    static std::vector<std::string> defaultClothesSunny;
+    static std::vector<std::string> defaultClothesRainy;
+    static std::vector<std::string> defaultClothesSnowy;
+    static std::vector<std::string> defaultClothesCloudy;
+    static std::vector<std::string> defaultFoodSunny;
+    static std::vector<std::string> defaultFoodRainy;
+    static std::vector<std::string> defaultFoodSnowy;
+    static std::vector<std::string> defaultFoodCloudy;
+
 public:
     static std::string predictClimate(const WeatherData* data) {
         if (data->getIsPrecipitation()) {
@@ -44,36 +71,30 @@ public:
         }
     }
 
-    static std::vector<std::string> suggestClothes(const std::string* climate) {
-        std::vector<std::string> clothes;
-        if (*climate == "Snowy" || *climate == "Cold") {
-            clothes = {"Warm coat", "Scarf", "Gloves", "Boots"};
-        } else if (*climate == "Rainy") {
-            clothes = {"Raincoat", "Umbrella", "Waterproof shoes"};
-        } else if (*climate == "Sunny") {
-            clothes = {"Light shirt", "Sunglasses", "Hat"};
-        } else {
-            clothes = {"Light jacket", "Comfortable shoes"};
-        }
-        return clothes;
+    static std::vector<std::string> suggestClothes(const std::string& climate) {
+        if (climate == "Snowy") return defaultClothesSnowy;
+        if (climate == "Rainy") return defaultClothesRainy;
+        if (climate == "Sunny") return defaultClothesSunny;
+        return defaultClothesCloudy;
     }
 
-    static std::vector<std::string> suggestFood(const std::string* climate) {
-        std::vector<std::string> foods;
-        
-        if (*climate == "Snowy" || *climate == "Cold") {
-            foods = {"Hot soup", "Warm tea", "Stew"};
-        } else if (*climate == "Rainy") {
-            foods = {"Comfort food", "Hot chocolate", "Grilled cheese sandwich"};
-        } else if (*climate == "Sunny") {
-            foods = {"Salad", "Cold drinks", "Ice cream"};
-        } else {
-            foods = {"Balanced meal", "Fruit"};
-        }
-        return foods;
-
+    static std::vector<std::string> suggestFood(const std::string& climate) {
+        if (climate == "Snowy") return defaultFoodSnowy;
+        if (climate == "Rainy") return defaultFoodRainy;
+        if (climate == "Sunny") return defaultFoodSunny;
+        return defaultFoodCloudy;
     }
 };
+
+// Initialize static member variables
+std::vector<std::string> WeatherPredictor::defaultClothesSunny = {"Light shirt", "Sunglasses", "Hat"};
+std::vector<std::string> WeatherPredictor::defaultClothesRainy = {"Raincoat", "Umbrella", "Waterproof shoes"};
+std::vector<std::string> WeatherPredictor::defaultClothesSnowy = {"Warm coat", "Scarf", "Gloves", "Boots"};
+std::vector<std::string> WeatherPredictor::defaultClothesCloudy = {"Light jacket", "Comfortable shoes"};
+std::vector<std::string> WeatherPredictor::defaultFoodSunny = {"Salad", "Cold drinks", "Ice cream"};
+std::vector<std::string> WeatherPredictor::defaultFoodRainy = {"Comfort food", "Hot chocolate", "Grilled cheese sandwich"};
+std::vector<std::string> WeatherPredictor::defaultFoodSnowy = {"Hot soup", "Warm tea", "Stew"};
+std::vector<std::string> WeatherPredictor::defaultFoodCloudy = {"Balanced meal", "Fruit"};
 
 int main() {
     const int NUM_DAYS = 3;
@@ -89,8 +110,8 @@ int main() {
     for (int i = 0; i < NUM_DAYS; i++) {
         std::cout << "\n--- Day " << i + 1 << " Forecast ---\n";
         std::string climate = WeatherPredictor::predictClimate(&weatherDataArray[i]);
-        std::vector<std::string> clothes = WeatherPredictor::suggestClothes(&climate);
-        std::vector<std::string> foods = WeatherPredictor::suggestFood(&climate);
+        std::vector<std::string> clothes = WeatherPredictor::suggestClothes(climate);
+        std::vector<std::string> foods = WeatherPredictor::suggestFood(climate);
         
         std::cout << "Predicted climate: " << climate << std::endl;
         
@@ -101,12 +122,4 @@ int main() {
         
         std::cout << "Suggested foods:" << std::endl;
         for (const auto& item : foods) {
-            std::cout << "- " << item << std::endl;
-        }
-    }
-    
-    // Free the dynamically allocated memory
-    delete[] weatherDataArray;
-
-    return 0;
-}
+            std::cout << "-
