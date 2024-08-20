@@ -36,7 +36,7 @@ public:
     double getHumidity() const { return this->humidity; }
     double getWindSpeed() const { return this->windSpeed; }
     bool getIsPrecipitation() const { return this->isPrecipitation; }
-
+    #static member fuction
     static int getInstanceCount() {
         return instanceCount;
     }
