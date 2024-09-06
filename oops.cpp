@@ -21,6 +21,23 @@ public:
         instanceCount--;
     }
 
+    // Setter methods to encapsulate the modification of member variables
+    void setTemperature(double temp) { this->temperature = temp; }
+    void setHumidity(double hum) { this->humidity = hum; }
+    void setWindSpeed(double wind) { this->windSpeed = wind; }
+    void setIsPrecipitation(bool precipitation) { this->isPrecipitation = precipitation; }
+
+    // Getter methods to encapsulate access to member variables
+    double getTemperature() const { return this->temperature; }
+    double getHumidity() const { return this->humidity; }
+    double getWindSpeed() const { return this->windSpeed; }
+    bool getIsPrecipitation() const { return this->isPrecipitation; }
+
+    static int getInstanceCount() {
+        return instanceCount;
+    }
+
+    // A method to encapsulate the input operation
     void getInput() {
         std::cout << "Enter temperature (°C): ";
         std::cin >> this->temperature;
@@ -30,15 +47,6 @@ public:
         std::cin >> this->windSpeed;
         std::cout << "Is there precipitation? (1 for yes, 0 for no): ";
         std::cin >> this->isPrecipitation;
-    }
-
-    double getTemperature() const { return this->temperature; }
-    double getHumidity() const { return this->humidity; }
-    double getWindSpeed() const { return this->windSpeed; }
-    bool getIsPrecipitation() const { return this->isPrecipitation; }
-    #static member fuction
-    static int getInstanceCount() {
-        return instanceCount;
     }
 };
 
@@ -58,13 +66,14 @@ private:
     static std::vector<std::string> defaultFoodCloudy;
 
 public:
-    static std::string predictClimate(const WeatherData* data) {
-        if (data->getIsPrecipitation()) {
-            if (data->getTemperature() <= 0) return "Snowy";
+    // Pass by reference instead of raw pointer
+    static std::string predictClimate(const WeatherData& data) {
+        if (data.getIsPrecipitation()) {
+            if (data.getTemperature() <= 0) return "Snowy";
             else return "Rainy";
-        } else if (data->getTemperature() > 25 && data->getHumidity() < 60) {
+        } else if (data.getTemperature() > 25 && data.getHumidity() < 60) {
             return "Sunny";
-        } else if (data->getTemperature() < 10) {
+        } else if (data.getTemperature() < 10) {
             return "Cold";
         } else {
             return "Cloudy";
@@ -109,7 +118,7 @@ int main() {
     
     for (int i = 0; i < NUM_DAYS; i++) {
         std::cout << "\n--- Day " << i + 1 << " Forecast ---\n";
-        std::string climate = WeatherPredictor::predictClimate(&weatherDataArray[i]);
+        std::string climate = WeatherPredictor::predictClimate(weatherDataArray[i]);
         std::vector<std::string> clothes = WeatherPredictor::suggestClothes(climate);
         std::vector<std::string> foods = WeatherPredictor::suggestFood(climate);
         
@@ -122,4 +131,12 @@ int main() {
         
         std::cout << "Suggested foods:" << std::endl;
         for (const auto& item : foods) {
-            std::cout << "-
+            std::cout << "- " << item << std::endl;
+        }
+    }
+
+    // Clean up dynamically allocated memory
+    delete[] weatherDataArray;
+
+    return 0;
+}
