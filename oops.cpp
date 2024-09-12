@@ -104,7 +104,7 @@ public:
         if (climate == "Snowy") return defaultFoodSnowy;
         if (climate == "Rainy") return defaultFoodRainy;
         if (climate == "Sunny") return defaultFoodSunny;
-        return defaultFoodCloudy;
+        return defaultFoodCloudy ;
     }
 };
 
