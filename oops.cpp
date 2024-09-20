@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-// WeatherData class demonstrating both default and parameterized constructors
+// WeatherData class demonstrating both default and parameterized constructor
 class WeatherData {
 private:
     double temperature;
