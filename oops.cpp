@@ -2,8 +2,18 @@
 #include <string>
 #include <vector>
 
+// Abstract base class: WeatherDisplay
+class WeatherDisplay {
+public:
+    // Pure virtual function making this an abstract class
+    virtual void displayWeatherInfo() const = 0;
+
+    // Virtual destructor
+    virtual ~WeatherDisplay() {}
+};
+
 // Base class: WeatherData
-class WeatherData {
+class WeatherData : public WeatherDisplay {
 protected:
     double temperature;
     double humidity;
@@ -26,7 +36,7 @@ public:
     }
 
     // Destructor
-    ~WeatherData() {
+    ~WeatherData() override {
         instanceCount--;
     }
 
@@ -58,6 +68,14 @@ public:
         std::cout << "Is there precipitation? (1 for yes, 0 for no): ";
         std::cin >> this->isPrecipitation;
     }
+
+    // Implementation of pure virtual function from WeatherDisplay
+    void displayWeatherInfo() const override {
+        std::cout << "Temperature: " << temperature << "°C" << std::endl;
+        std::cout << "Humidity: " << humidity << "%" << std::endl;
+        std::cout << "Wind Speed: " << windSpeed << " km/h" << std::endl;
+        std::cout << "Precipitation: " << (isPrecipitation ? "Yes" : "No") << std::endl;
+    }
 };
 
 // Initialize static member variable
@@ -73,6 +91,9 @@ public:
     AdvancedWeatherData(double temp, double hum, double wind, bool precipitation, const std::string& loc)
         : WeatherData(temp, hum, wind, precipitation), location(loc) {}
 
+    // Default constructor
+    AdvancedWeatherData() : WeatherData(), location("Unknown") {}
+
     // Setter for location
     void setLocation(const std::string& loc) { this->location = loc; }
 
@@ -86,24 +107,21 @@ public:
         std::cin >> this->location;
     }
 
-    // Function Overloading: Display method with different parameters
-
-    // 1. Display weather information (default)
-    void displayWeatherInfo() const {
+    // Overriding displayWeatherInfo from WeatherData and WeatherDisplay
+    void displayWeatherInfo() const override {
         std::cout << "Location: " << location << std::endl;
-        std::cout << "Temperature: " << temperature << "°C" << std::endl;
-        std::cout << "Humidity: " << humidity << "%" << std::endl;
-        std::cout << "Wind Speed: " << windSpeed << " km/h" << std::endl;
-        std::cout << "Precipitation: " << (isPrecipitation ? "Yes" : "No") << std::endl;
+        WeatherData::displayWeatherInfo();  // Call base class method
     }
 
-    // 2. Display weather information with an additional title
+    // Function Overloading: Display method with different parameters
+
+    // 1. Display weather information with an additional title
     void displayWeatherInfo(const std::string& title) const {
         std::cout << "\n--- " << title << " ---\n";
         displayWeatherInfo();  // Call the default display method
     }
 
-    // 3. Display weather information with all parameters explicitly
+    // 2. Display weather information with all parameters explicitly
     void displayWeatherInfo(double temp, double hum, double wind, bool precipitation) const {
         std::cout << "Custom Display Mode: " << std::endl;
         std::cout << "Temperature: " << temp << "°C" << std::endl;
@@ -113,107 +131,22 @@ public:
     }
 };
 
-// Base class: WeatherPredictor
-class WeatherPredictor {
-protected:
-    static std::vector<std::string> defaultClothesSunny;
-    static std::vector<std::string> defaultClothesRainy;
-    static std::vector<std::string> defaultClothesSnowy;
-    static std::vector<std::string> defaultClothesCloudy;
-    static std::vector<std::string> defaultFoodSunny;
-    static std::vector<std::string> defaultFoodRainy;
-    static std::vector<std::string> defaultFoodSnowy;
-    static std::vector<std::string> defaultFoodCloudy;
-
-public:
-    static std::string predictClimate(const WeatherData& data) {
-        if (data.getIsPrecipitation()) {
-            if (data.getTemperature() <= 0) return "Snowy";
-            else return "Rainy";
-        } else if (data.getTemperature() > 25 && data.getHumidity() < 60) {
-            return "Sunny";
-        } else if (data.getTemperature() < 10) {
-            return "Cold";
-        } else {
-            return "Cloudy";
-        }
-    }
-
-    static std::vector<std::string> suggestClothes(const std::string& climate) {
-        if (climate == "Snowy") return defaultClothesSnowy;
-        if (climate == "Rainy") return defaultClothesRainy;
-        if (climate == "Sunny") return defaultClothesSunny;
-        return defaultClothesCloudy;
-    }
-
-    static std::vector<std::string> suggestFood(const std::string& climate) {
-        if (climate == "Snowy") return defaultFoodSnowy;
-        if (climate == "Rainy") return defaultFoodRainy;
-        if (climate == "Sunny") return defaultFoodSunny;
-        return defaultFoodCloudy;
-    }
-};
-
-// Derived class: SeasonalWeatherPredictor demonstrating Single Inheritance
-class SeasonalWeatherPredictor : public WeatherPredictor {
-public:
-    static std::string getSeasonalRecommendation(const std::string& climate) {
-        if (climate == "Snowy" || climate == "Cold") return "Stay indoors and keep warm!";
-        if (climate == "Rainy") return "Carry an umbrella or raincoat.";
-        if (climate == "Sunny") return "Stay hydrated and avoid direct sunlight.";
-        return "It's a calm day; enjoy your time outside.";
-    }
-};
-
-// Derived class: ExtendedSeasonalWeatherPredictor demonstrating Multilevel Inheritance
-class ExtendedSeasonalWeatherPredictor : public SeasonalWeatherPredictor {
-public:
-    static std::string getActivitySuggestion(const std::string& climate) {
-        if (climate == "Snowy") return "Great day for skiing!";
-        if (climate == "Rainy") return "Perfect for indoor games or movies.";
-        if (climate == "Sunny") return "Consider a picnic or a beach visit.";
-        return "Ideal day for a walk or a short hike.";
-    }
-};
-
-// Initialize static member variables of WeatherPredictor class
-std::vector<std::string> WeatherPredictor::defaultClothesSunny = {"Light shirt", "Sunglasses", "Hat"};
-std::vector<std::string> WeatherPredictor::defaultClothesRainy = {"Raincoat", "Umbrella", "Waterproof shoes"};
-std::vector<std::string> WeatherPredictor::defaultClothesSnowy = {"Warm coat", "Scarf", "Gloves", "Boots"};
-std::vector<std::string> WeatherPredictor::defaultClothesCloudy = {"Light jacket", "Comfortable shoes"};
-std::vector<std::string> WeatherPredictor::defaultFoodSunny = {"Salad", "Cold drinks", "Ice cream"};
-std::vector<std::string> WeatherPredictor::defaultFoodRainy = {"Comfort food", "Hot chocolate", "Grilled cheese sandwich"};
-std::vector<std::string> WeatherPredictor::defaultFoodSnowy = {"Hot soup", "Warm tea", "Stew"};
-std::vector<std::string> WeatherPredictor::defaultFoodCloudy = {"Balanced meal", "Fruit"};
-
-// Main function to demonstrate the usage of polymorphism and inheritance concept
+// Main function to demonstrate the usage of polymorphism, inheritance, abstract class, and virtual functions
 int main() {
-    // Create instances using the derived class AdvancedWeatherData
-    AdvancedWeatherData advWeather1(5.0, 70.0, 10.0, true, "New York");
-    AdvancedWeatherData advWeather2;
+    // Create a pointer of the abstract base class type pointing to a derived class object
+    WeatherDisplay* display1 = new AdvancedWeatherData(5.0, 70.0, 10.0, true, "New York");
+    WeatherDisplay* display2 = new AdvancedWeatherData();
 
-    // Manual input for the second instance
-    std::cout << "\nEnter weather data for day 2:\n";
-    advWeather2.getInput();
-
-    // Display weather information using overloaded functions
     std::cout << "\n--- Day 1 Weather Information ---\n";
-    advWeather1.displayWeatherInfo();
-    advWeather1.displayWeatherInfo("Detailed Day 1 Weather Report");
-    advWeather1.displayWeatherInfo(15.0, 80.0, 15.0, false);
+    display1->displayWeatherInfo();  // Polymorphic call using base class pointer
 
-    std::string climate1 = WeatherPredictor::predictClimate(advWeather1);
-    std::cout << "Predicted Climate: " << climate1 << std::endl;
-    std::cout << "Seasonal Recommendation: " << SeasonalWeatherPredictor::getSeasonalRecommendation(climate1) << std::endl;
-    std::cout << "Activity Suggestion: " << ExtendedSeasonalWeatherPredictor::getActivitySuggestion(climate1) << std::endl;
+    std::cout << "\n--- Day 2 Weather Information (Manual Input) ---\n";
+    dynamic_cast<AdvancedWeatherData*>(display2)->getInput();  // Casting to derived type to use derived class method
+    display2->displayWeatherInfo();
 
-    std::cout << "\n--- Day 2 Weather Information ---\n";
-    advWeather2.displayWeatherInfo();
-
-    std::string climate2 = WeatherPredictor::predictClimate(advWeather2);
-    std::cout << "Predicted Climate: " << climate2 << std::endl;
-    std::cout << "Seasonal Recommendation: " << SeasonalWeatherPredictor::getSeasonalRecommendation(climate2) << std::endl;
-    std::cout << "Activity Suggestion: " << ExtendedSeasonalWeatherPredictor::getActivitySuggestion(climate2) << std::endl;
+    // Clean up
+    delete display1;
+    delete display2;
 
     return 0;
 }
