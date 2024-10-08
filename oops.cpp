@@ -2,9 +2,9 @@
 #include <string>
 #include <vector>
 
-// WeatherData class demonstrating both default and parameterized constructors
+// Base class: WeatherData
 class WeatherData {
-private:
+protected:
     double temperature;
     double humidity;
     double windSpeed;
@@ -63,10 +63,42 @@ public:
 // Initialize static member variable
 int WeatherData::instanceCount = 0;
 
-// WeatherPredictor class for predictions and suggestions
-class WeatherPredictor {
+// Derived class: AdvancedWeatherData demonstrating Single Inheritance
+class AdvancedWeatherData : public WeatherData {
 private:
-    // Static member variables for default recommendations
+    std::string location;
+
+public:
+    // Parameterized constructor with additional parameter for location
+    AdvancedWeatherData(double temp, double hum, double wind, bool precipitation, const std::string& loc)
+        : WeatherData(temp, hum, wind, precipitation), location(loc) {}
+
+    // Setter for location
+    void setLocation(const std::string& loc) { this->location = loc; }
+
+    // Getter for location
+    std::string getLocation() const { return this->location; }
+
+    // Overriding getInput method to include location input
+    void getInput() {
+        WeatherData::getInput();  // Call base class method
+        std::cout << "Enter location: ";
+        std::cin >> this->location;
+    }
+
+    // Display method
+    void displayWeatherInfo() const {
+        std::cout << "Location: " << location << std::endl;
+        std::cout << "Temperature: " << temperature << "°C" << std::endl;
+        std::cout << "Humidity: " << humidity << "%" << std::endl;
+        std::cout << "Wind Speed: " << windSpeed << " km/h" << std::endl;
+        std::cout << "Precipitation: " << (isPrecipitation ? "Yes" : "No") << std::endl;
+    }
+};
+
+// Base class: WeatherPredictor
+class WeatherPredictor {
+protected:
     static std::vector<std::string> defaultClothesSunny;
     static std::vector<std::string> defaultClothesRainy;
     static std::vector<std::string> defaultClothesSnowy;
@@ -77,7 +109,6 @@ private:
     static std::vector<std::string> defaultFoodCloudy;
 
 public:
-    // Static method for predicting climate
     static std::string predictClimate(const WeatherData& data) {
         if (data.getIsPrecipitation()) {
             if (data.getTemperature() <= 0) return "Snowy";
@@ -91,7 +122,6 @@ public:
         }
     }
 
-    // Static method for suggesting clothes
     static std::vector<std::string> suggestClothes(const std::string& climate) {
         if (climate == "Snowy") return defaultClothesSnowy;
         if (climate == "Rainy") return defaultClothesRainy;
@@ -99,16 +129,37 @@ public:
         return defaultClothesCloudy;
     }
 
-    // Static method for suggesting food
     static std::vector<std::string> suggestFood(const std::string& climate) {
         if (climate == "Snowy") return defaultFoodSnowy;
         if (climate == "Rainy") return defaultFoodRainy;
         if (climate == "Sunny") return defaultFoodSunny;
-        return defaultFoodCloudy ;
+        return defaultFoodCloudy;
     }
 };
 
-// Initialize static member variables
+// Derived class: SeasonalWeatherPredictor demonstrating Single Inheritance
+class SeasonalWeatherPredictor : public WeatherPredictor {
+public:
+    static std::string getSeasonalRecommendation(const std::string& climate) {
+        if (climate == "Snowy" || climate == "Cold") return "Stay indoors and keep warm!";
+        if (climate == "Rainy") return "Carry an umbrella or raincoat.";
+        if (climate == "Sunny") return "Stay hydrated and avoid direct sunlight.";
+        return "It's a calm day; enjoy your time outside.";
+    }
+};
+
+// Derived class: ExtendedSeasonalWeatherPredictor demonstrating Multilevel Inheritance
+class ExtendedSeasonalWeatherPredictor : public SeasonalWeatherPredictor {
+public:
+    static std::string getActivitySuggestion(const std::string& climate) {
+        if (climate == "Snowy") return "Great day for skiing!";
+        if (climate == "Rainy") return "Perfect for indoor games or movies.";
+        if (climate == "Sunny") return "Consider a picnic or a beach visit.";
+        return "Ideal day for a walk or a short hike.";
+    }
+};
+
+// Initialize static member variables of WeatherPredictor class
 std::vector<std::string> WeatherPredictor::defaultClothesSunny = {"Light shirt", "Sunglasses", "Hat"};
 std::vector<std::string> WeatherPredictor::defaultClothesRainy = {"Raincoat", "Umbrella", "Waterproof shoes"};
 std::vector<std::string> WeatherPredictor::defaultClothesSnowy = {"Warm coat", "Scarf", "Gloves", "Boots"};
@@ -118,43 +169,32 @@ std::vector<std::string> WeatherPredictor::defaultFoodRainy = {"Comfort food", "
 std::vector<std::string> WeatherPredictor::defaultFoodSnowy = {"Hot soup", "Warm tea", "Stew"};
 std::vector<std::string> WeatherPredictor::defaultFoodCloudy = {"Balanced meal", "Fruit"};
 
+// Main function to demonstrate the usage of the inheritance concept
 int main() {
-    // Using both default and parameterized constructors
-    const int NUM_DAYS = 3;
+    // Create instances using the derived class AdvancedWeatherData
+    AdvancedWeatherData advWeather1(5.0, 70.0, 10.0, true, "New York");
+    AdvancedWeatherData advWeather2;
 
-    // Create an array of WeatherData objects using both constructors
-    WeatherData weatherDataArray[NUM_DAYS] = {
-        WeatherData(),  // Default constructor
-        WeatherData(22.5, 65.0, 15.0, false),  // Parameterized constructor
-        WeatherData()   // Default constructor
-    };
+    // Manual input for the second instance
+    std::cout << "\nEnter weather data for day 2:\n";
+    advWeather2.getInput();
 
-    // For the days using the default constructor, allow manual data input
-    std::cout << "\nEnter weather data for day 1:\n";
-    weatherDataArray[0].getInput();
+    // Display weather information and get predictions
+    std::cout << "\n--- Day 1 Weather Information ---\n";
+    advWeather1.displayWeatherInfo();
 
-    std::cout << "\nEnter weather data for day 3:\n";
-    weatherDataArray[2].getInput();
+    std::string climate1 = WeatherPredictor::predictClimate(advWeather1);
+    std::cout << "Predicted Climate: " << climate1 << std::endl;
+    std::cout << "Seasonal Recommendation: " << SeasonalWeatherPredictor::getSeasonalRecommendation(climate1) << std::endl;
+    std::cout << "Activity Suggestion: " << ExtendedSeasonalWeatherPredictor::getActivitySuggestion(climate1) << std::endl;
 
-    // Predict climate and suggest clothes/food for each day
-    for (int i = 0; i < NUM_DAYS; i++) {
-        std::cout << "\n--- Day " << i + 1 << " Forecast ---\n";
-        std::string climate = WeatherPredictor::predictClimate(weatherDataArray[i]);
-        std::vector<std::string> clothes = WeatherPredictor::suggestClothes(climate);
-        std::vector<std::string> foods = WeatherPredictor::suggestFood(climate);
+    std::cout << "\n--- Day 2 Weather Information ---\n";
+    advWeather2.displayWeatherInfo();
 
-        std::cout << "Predicted climate: " << climate << std::endl;
-
-        std::cout << "Suggested clothes:" << std::endl;
-        for (const auto& item : clothes) {
-            std::cout << "- " << item << std::endl;
-        }
-
-        std::cout << "Suggested foods:" << std::endl;
-        for (const auto& item : foods) {
-            std::cout << "- " << item << std::endl;
-        }
-    }
+    std::string climate2 = WeatherPredictor::predictClimate(advWeather2);
+    std::cout << "Predicted Climate: " << climate2 << std::endl;
+    std::cout << "Seasonal Recommendation: " << SeasonalWeatherPredictor::getSeasonalRecommendation(climate2) << std::endl;
+    std::cout << "Activity Suggestion: " << ExtendedSeasonalWeatherPredictor::getActivitySuggestion(climate2) << std::endl;
 
     return 0;
 }
