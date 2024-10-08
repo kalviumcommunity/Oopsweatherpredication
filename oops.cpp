@@ -63,7 +63,7 @@ public:
 // Initialize static member variable
 int WeatherData::instanceCount = 0;
 
-// Derived class: AdvancedWeatherData demonstrating Single Inheritance
+// Derived class: AdvancedWeatherData demonstrating Single Inheritance and Function Overloading
 class AdvancedWeatherData : public WeatherData {
 private:
     std::string location;
@@ -86,13 +86,30 @@ public:
         std::cin >> this->location;
     }
 
-    // Display method
+    // Function Overloading: Display method with different parameters
+
+    // 1. Display weather information (default)
     void displayWeatherInfo() const {
         std::cout << "Location: " << location << std::endl;
         std::cout << "Temperature: " << temperature << "°C" << std::endl;
         std::cout << "Humidity: " << humidity << "%" << std::endl;
         std::cout << "Wind Speed: " << windSpeed << " km/h" << std::endl;
         std::cout << "Precipitation: " << (isPrecipitation ? "Yes" : "No") << std::endl;
+    }
+
+    // 2. Display weather information with an additional title
+    void displayWeatherInfo(const std::string& title) const {
+        std::cout << "\n--- " << title << " ---\n";
+        displayWeatherInfo();  // Call the default display method
+    }
+
+    // 3. Display weather information with all parameters explicitly
+    void displayWeatherInfo(double temp, double hum, double wind, bool precipitation) const {
+        std::cout << "Custom Display Mode: " << std::endl;
+        std::cout << "Temperature: " << temp << "°C" << std::endl;
+        std::cout << "Humidity: " << hum << "%" << std::endl;
+        std::cout << "Wind Speed: " << wind << " km/h" << std::endl;
+        std::cout << "Precipitation: " << (precipitation ? "Yes" : "No") << std::endl;
     }
 };
 
@@ -169,7 +186,7 @@ std::vector<std::string> WeatherPredictor::defaultFoodRainy = {"Comfort food", "
 std::vector<std::string> WeatherPredictor::defaultFoodSnowy = {"Hot soup", "Warm tea", "Stew"};
 std::vector<std::string> WeatherPredictor::defaultFoodCloudy = {"Balanced meal", "Fruit"};
 
-// Main function to demonstrate the usage of the inheritance concept
+// Main function to demonstrate the usage of polymorphism and inheritance concept
 int main() {
     // Create instances using the derived class AdvancedWeatherData
     AdvancedWeatherData advWeather1(5.0, 70.0, 10.0, true, "New York");
@@ -179,9 +196,11 @@ int main() {
     std::cout << "\nEnter weather data for day 2:\n";
     advWeather2.getInput();
 
-    // Display weather information and get predictions
+    // Display weather information using overloaded functions
     std::cout << "\n--- Day 1 Weather Information ---\n";
     advWeather1.displayWeatherInfo();
+    advWeather1.displayWeatherInfo("Detailed Day 1 Weather Report");
+    advWeather1.displayWeatherInfo(15.0, 80.0, 15.0, false);
 
     std::string climate1 = WeatherPredictor::predictClimate(advWeather1);
     std::cout << "Predicted Climate: " << climate1 << std::endl;
