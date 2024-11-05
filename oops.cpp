@@ -115,16 +115,34 @@ public:
     }
 };
 
-// Main function to demonstrate DIP, polymorphism, and SRP
+// New derived class: ForecastWeatherData - adds responsibility of forecasting
+class ForecastWeatherData : public WeatherDisplay {
+private:
+    double temperature;
+    std::string forecastSummary;
+
+public:
+    ForecastWeatherData(double temp, const std::string& summary)
+        : temperature(temp), forecastSummary(summary) {}
+
+    // Overriding displayWeatherInfo to provide forecast data
+    void displayWeatherInfo() const override {
+        std::cout << "Forecast Temperature: " << temperature << "°C" << std::endl;
+        std::cout << "Forecast Summary: " << forecastSummary << std::endl;
+    }
+};
+
+// Main function to demonstrate OCP, DIP, polymorphism, and SRP
 int main() {
     // Use WeatherDisplay interface for dependency injection
     std::vector<WeatherDisplay*> displays;
 
-    // Adding AdvancedWeatherData objects as WeatherDisplay pointers to ensure DIP
+    // Adding different WeatherDisplay objects to ensure OCP
     displays.push_back(new AdvancedWeatherData(5.0, 70.0, 10.0, true, "New York"));
     displays.push_back(new AdvancedWeatherData());
+    displays.push_back(new ForecastWeatherData(15.0, "Cloudy with a chance of rain"));
 
-    // Display weather information
+    // Display weather information for each entry
     for (auto display : displays) {
         display->displayWeatherInfo();
         std::cout << "\n";
