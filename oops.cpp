@@ -12,7 +12,7 @@ public:
     virtual ~WeatherDisplay() {}
 };
 
-// Base class: WeatherData
+// Base class: WeatherData - responsible for handling basic weather data
 class WeatherData : public WeatherDisplay {
 protected:
     double temperature;
@@ -81,7 +81,7 @@ public:
 // Initialize static member variable
 int WeatherData::instanceCount = 0;
 
-// Derived class: AdvancedWeatherData demonstrating Single Inheritance and Function Overloading
+// Derived class: AdvancedWeatherData - adds responsibility of location data
 class AdvancedWeatherData : public WeatherData {
 private:
     std::string location;
@@ -104,7 +104,8 @@ public:
     void getInput() {
         WeatherData::getInput();  // Call base class method
         std::cout << "Enter location: ";
-        std::cin >> this->location;
+        std::cin.ignore(); // Clear the newline character from input buffer
+        std::getline(std::cin, this->location);
     }
 
     // Overriding displayWeatherInfo from WeatherData and WeatherDisplay
@@ -112,26 +113,9 @@ public:
         std::cout << "Location: " << location << std::endl;
         WeatherData::displayWeatherInfo();  // Call base class method
     }
-
-    // Function Overloading: Display method with different parameters
-
-    // 1. Display weather information with an additional title
-    void displayWeatherInfo(const std::string& title) const {
-        std::cout << "\n--- " << title << " ---\n";
-        displayWeatherInfo();  // Call the default display method
-    }
-
-    // 2. Display weather information with all parameters explicitly
-    void displayWeatherInfo(double temp, double hum, double wind, bool precipitation) const {
-        std::cout << "Custom Display Mode: " << std::endl;
-        std::cout << "Temperature: " << temp << "°C" << std::endl;
-        std::cout << "Humidity: " << hum << "%" << std::endl;
-        std::cout << "Wind Speed: " << wind << " km/h" << std::endl;
-        std::cout << "Precipitation: " << (precipitation ? "Yes" : "No") << std::endl;
-    }
 };
 
-// Main function to demonstrate the usage of polymorphism, inheritance, abstract class, and virtual functions
+// Main function to demonstrate SRP, polymorphism, inheritance, abstract class, and virtual functions
 int main() {
     // Create a pointer of the abstract base class type pointing to a derived class object
     WeatherDisplay* display1 = new AdvancedWeatherData(5.0, 70.0, 10.0, true, "New York");
