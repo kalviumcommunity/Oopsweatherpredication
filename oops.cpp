@@ -115,22 +115,30 @@ public:
     }
 };
 
-// Main function to demonstrate SRP, polymorphism, inheritance, abstract class, and virtual functions
+// Main function to demonstrate DIP, polymorphism, and SRP
 int main() {
-    // Create a pointer of the abstract base class type pointing to a derived class object
-    WeatherDisplay* display1 = new AdvancedWeatherData(5.0, 70.0, 10.0, true, "New York");
-    WeatherDisplay* display2 = new AdvancedWeatherData();
+    // Use WeatherDisplay interface for dependency injection
+    std::vector<WeatherDisplay*> displays;
 
-    std::cout << "\n--- Day 1 Weather Information ---\n";
-    display1->displayWeatherInfo();  // Polymorphic call using base class pointer
+    // Adding AdvancedWeatherData objects as WeatherDisplay pointers to ensure DIP
+    displays.push_back(new AdvancedWeatherData(5.0, 70.0, 10.0, true, "New York"));
+    displays.push_back(new AdvancedWeatherData());
 
+    // Display weather information
+    for (auto display : displays) {
+        display->displayWeatherInfo();
+        std::cout << "\n";
+    }
+
+    // Manual input for the second weather data
     std::cout << "\n--- Day 2 Weather Information (Manual Input) ---\n";
-    dynamic_cast<AdvancedWeatherData*>(display2)->getInput();  // Casting to derived type to use derived class method
-    display2->displayWeatherInfo();
+    dynamic_cast<AdvancedWeatherData*>(displays[1])->getInput();  // Casting to derived type
+    displays[1]->displayWeatherInfo();
 
     // Clean up
-    delete display1;
-    delete display2;
+    for (auto display : displays) {
+        delete display;
+    }
 
     return 0;
 }
